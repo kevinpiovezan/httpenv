@@ -16,14 +16,14 @@ jobs:
     steps:           
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
-        # with:
-          #username: ${{ secrets.DOCKERHUB_USERNAME }}
-          #password: ${{ secrets.DOCKERHUB_TOKEN }}
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
       
       - name: Docker build
         uses: docker/build-push-action@v4
         with:
           push: ${{ github.event_name != 'pull_request' }}
-          tags: kevinpiovezan/docker-ci-automation:latest,kevinpiovezan/docker-ci-automation:01
+          tags: kevinpiovezan/docker-ci-automation:latest,kevinpiovezan/docker-ci-automation:02
           cache-from: type=gha
           cache-to: type=gha,mode=max
