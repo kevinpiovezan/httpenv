@@ -27,6 +27,17 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       
+      - name: Docker build
+        uses: docker/build-push-action@v4
+        with:
+          push: false
+          load: true
+          tags: ${{ steps.docker_meta.outputs.tags }}
+          labels: ${{ steps.docker_meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64,linux/arm64,linux/arm/v7                 
+
       - name: Run Trivy for all CVEs (non-blocking)
         uses: aquasecurity/trivy-action@master
         with:
@@ -48,18 +59,8 @@ jobs:
           #  type=ref,event=branch
           #  type=semver,pattern={{version}}
 
-      - name: Docker build
-        uses: docker/build-push-action@v4
-        with:
-          push: false
-          load: true
-          tags: ${{ steps.docker_meta.outputs.tags }}
-          labels: ${{ steps.docker_meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          platforms: linux/amd64,linux/arm64,linux/arm/v7
-            # If PR, put image tags in the PR comments
-        # from https://github.com/marketplace/actions/create-or-update-comment
+       # If PR, put image tags in the PR comments
+       # from https://github.com/marketplace/actions/create-or-update-comment
       - name: Find comment for image tags
         uses: peter-evans/find-comment@v2
         if: github.event_name == 'pull_request'
