@@ -1,7 +1,6 @@
 ---
 name: 01 Basic Docker Build
 # simplest workflow possible
-#vai 
 on:
   push:
     branches:
@@ -28,6 +27,13 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       
+      - name: Run Trivy for all CVEs (non-blocking)
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ github.run_id }}
+          exit-code: 0
+          format: table 
+
       - name: Docker meta
         id: docker_meta
         uses: docker/metadata-action@v4
@@ -46,6 +52,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           push: false
+          load: true
           tags: ${{ steps.docker_meta.outputs.tags }}
           labels: ${{ steps.docker_meta.outputs.labels }}
           cache-from: type=gha
